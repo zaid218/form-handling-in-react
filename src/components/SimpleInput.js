@@ -1,38 +1,79 @@
-import { useEffect, useState } from "react";
+import useInput from "../hooks/use-input";
 
 const SimpleInput = (props) => {
-  const [enteredName, setEnteredName] = useState('')
-  const [enteredNameIsTouched,setEnteredNameIsTouched]=useState(false)
-  const enteredNameIsValid = enteredName.trim() !== '';
-  const nameInputIsInvalid = !enteredNameIsValid && enteredNameIsTouched;
+  const {
+    value: enteredName,
+    hasError: nameInputIsInvalid,
+    valueChangeHandler: nameInputChangeHandler,
+    inputBlurHandler: nameInputBlurHandler,
+    valueIsValid: enteredNameIsValid,
+    reset: resetNameInput,
+    setIsTouched: setEnteredNameIsTouched,
+  } = useInput((v)=>v.trim() !== "");
 
+  const {
+    value: enteredEmail,
+    hasError: emailInputIsInvalid,
+    valueChangeHandler: emailInputChangeHandler,
+    inputBlurHandler: emailInputBlurHandler,
+    valueIsValid: enteredEmailIsValid,
+    reset: resetEmailInput,
+    setIsTouched: setEnteredEmailIsTouched,
+  } = useInput((inp)=>
+    inp.trim() !== "" &&
+      inp.includes("@") 
+  );
+  //const [enteredName, setEnteredName] = useState("");
+  //const [enteredNameIsTouched, setEnteredNameIsTouched] = useState(false);
+  //const [enteredEmail, setEnteredEmail] = useState("");
+  //const [enteredEmailIsTouched, setEnteredEmailIsTouched] = useState(false);
+  //const enteredNameIsValid = enteredName.trim() !== "";
+  // const enteredEmailIsValid =
+  //   enteredEmail.trim() !== "" &&
+  //   enteredEmail.indexOf("@") > 0 &&
+  //   enteredEmail.indexOf(".") - enteredEmail.indexOf("@") > 1;
+
+  //const nameInputIsInvalid = !enteredNameIsValid && enteredNameIsTouched;
+  //const emailInputIsInvalid = !enteredEmailIsValid && enteredEmailIsTouched;
   let formIsValid = false;
-  
-    if (enteredNameIsValid) {
-      formIsValid=true
-    } 
-  
+
+  if (enteredNameIsValid && enteredEmailIsValid) {
+    formIsValid = true;
+  }
 
   const formSubmitHandler = (event) => {
     event.preventDefault();
-    setEnteredNameIsTouched(true)
-    if (!enteredNameIsValid) {
+    setEnteredNameIsTouched(true);
+    setEnteredEmailIsTouched(true);
+    if (!enteredNameIsValid || !enteredEmailIsValid) {
       return;
     }
-    setEnteredNameIsTouched(false);
-    setEnteredName("")
-  }
-  
-  const nameInputChangeHandler = (event) => {
-    setEnteredName(event.target.value);
-  }
-  
-  const nameInputBlurHander = () => {
-    setEnteredNameIsTouched(true)
-  }
+    // setEnteredNameIsTouched(false);
+    // setEnteredName("");
+    resetNameInput();
+    resetEmailInput()
+  };
+
+  // const nameInputChangeHandler = (event) => {
+  //   setEnteredName(event.target.value);
+  // };
+
+  // const emailInputChangeHandler = (event) => {
+  //   setEnteredEmail(event.target.value);
+  // };
+
+  // const nameInputBlurHander = () => {
+  //   setEnteredNameIsTouched(true);
+  // };
+  // const emailInputBlurHander = () => {
+  //   setEnteredEmailIsTouched(true);
+  // };
   const nameInputClasses = nameInputIsInvalid
     ? "form-control invalid"
-    : "form-control "; 
+    : "form-control ";
+  const EmailInputClasses = emailInputIsInvalid
+    ? "form-control invalid"
+    : "form-control ";
   return (
     <form onSubmit={formSubmitHandler}>
       <div className={nameInputClasses}>
@@ -42,10 +83,23 @@ const SimpleInput = (props) => {
           id="name"
           value={enteredName}
           onChange={nameInputChangeHandler}
-          onBlur={nameInputBlurHander}
+          onBlur={nameInputBlurHandler}
         />
         {nameInputIsInvalid && (
           <p className="error-text">entered text is not valid</p>
+        )}
+      </div>
+      <div className={EmailInputClasses}>
+        <label htmlFor="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          value={enteredEmail}
+          onChange={emailInputChangeHandler}
+          onBlur={emailInputBlurHandler}
+        />
+        {emailInputIsInvalid && (
+          <p className="error-text">entered email is not valid</p>
         )}
       </div>
       <div className="form-actions">
